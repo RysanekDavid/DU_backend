@@ -1,10 +1,11 @@
 require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
+const cors = require("cors");
 const shoppingListRoutes = require("./routes/shoppingListRoute.js");
 
 const app = express();
-
+app.use(cors());
 // Připojení k MongoDB
 mongoose
   .connect(process.env.MONGODB_URI)
