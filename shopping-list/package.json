@@ -1,14 +1,30 @@
 {
-  "name": "shopping-list",
-  "version": "0.0.0",
-  "private": true,
+  "name": "du_shoplist_backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "node ./bin/www",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RysanekDavid/DU_backend.git"
+  },
+  "author": "David Rysanek",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/RysanekDavid/DU_backend/issues"
+  },
+  "homepage": "https://github.com/RysanekDavid/DU_backend#readme",
   "dependencies": {
-    "cookie-parser": "~1.4.4",
-    "debug": "~2.6.9",
-    "express": "~4.16.1",
-    "morgan": "~1.9.1"
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-validator": "^7.0.1",
+    "mongodb": "^6.3.0",
+    "mongoose": "^8.0.2",
+    "uuid": "^9.0.1"
   }
 }
