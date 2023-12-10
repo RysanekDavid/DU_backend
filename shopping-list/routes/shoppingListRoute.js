@@ -24,4 +24,6 @@ router.delete(
   shoppingListController.removeItemFromList
 );
 
+router.put("/:listId", shoppingListController.updateShoppingListName);
+
 module.exports = router;

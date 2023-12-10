@@ -1,9 +1,7 @@
-// Předpokládáme, že máte model ShoppingList definovaný v `models/shoppingListModel.js`
 const ShoppingList = require("../models/shoppingListModel");
 
 exports.getAllShoppingLists = async (req, res) => {
   try {
-    // Zde byste získali seznamy z databáze
     const shoppingLists = await ShoppingList.find();
     res.json(shoppingLists);
   } catch (error) {
@@ -13,9 +11,19 @@ exports.getAllShoppingLists = async (req, res) => {
 
 exports.createShoppingList = async (req, res) => {
   try {
-    // Zde byste vytvořili nový seznam v databázi
-    const newShoppingList = new ShoppingList(req.body); // Předpokládá se, že req.body obsahuje potřebná data
+    // Vytvoříme nový seznam s daty získanými z požadavku
+    const newShoppingList = new ShoppingList({
+      name: req.body.name,
+      ownerId: req.body.userId,
+      members: [],
+      items: [],
+      archived: false,
+    });
+
+    // Uložíme seznam do databáze
     await newShoppingList.save();
+
+    // Odešleme vytvořený seznam zpět na frontend
     res.status(201).json(newShoppingList);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -51,18 +59,24 @@ exports.addItemToList = async (req, res) => {
 
 exports.updateItemInList = async (req, res) => {
   try {
-    const shoppingList = await ShoppingList.findById(req.params.listId);
+    const { listId, itemId } = req.params;
+    const { name, quantity, inBasket } = req.body;
+
+    const shoppingList = await ShoppingList.findById(listId);
     if (!shoppingList) {
       return res.status(404).json({ message: "Shopping list not found" });
     }
-    // Najděte položku v seznamu a aktualizujte ji
-    const item = shoppingList.items.id(req.params.itemId);
+
+    const item = shoppingList.items.id(itemId);
     if (!item) {
       return res.status(404).json({ message: "Item not found" });
     }
-    item.name = req.body.name || item.name;
-    item.quantity = req.body.quantity || item.quantity;
+
+    item.name = name || item.name;
+    item.quantity = quantity || item.quantity;
+    item.inBasket = inBasket !== undefined ? inBasket : item.inBasket;
     await shoppingList.save();
+
     res.status(200).json(item);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -79,6 +93,25 @@ exports.removeItemFromList = async (req, res) => {
     shoppingList.items.id(req.params.itemId).remove();
     await shoppingList.save();
     res.status(200).json({ message: "Item removed" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.updateShoppingListName = async (req, res) => {
+  try {
+    const { listId } = req.params;
+    const { newName } = req.body;
+
+    const shoppingList = await ShoppingList.findById(listId);
+    if (!shoppingList) {
+      return res.status(404).json({ message: "Shopping list not found" });
+    }
+
+    shoppingList.name = newName || shoppingList.name;
+    await shoppingList.save();
+
+    res.status(200).json(shoppingList);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
