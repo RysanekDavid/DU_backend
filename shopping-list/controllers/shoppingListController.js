@@ -9,12 +9,14 @@ exports.getAllShoppingLists = async (req, res) => {
   }
 };
 
+const mongoose = require('mongoose');
+
 exports.createShoppingList = async (req, res) => {
   try {
-    // Vytvoříme nový seznam s daty získanými z požadavku
+    // Vytvoříme nový seznam s náhodným ownerId
     const newShoppingList = new ShoppingList({
       name: req.body.name,
-      ownerId: req.body.userId,
+      ownerId: new mongoose.Types.ObjectId(), 
       members: [],
       items: [],
       archived: false,
@@ -23,12 +25,13 @@ exports.createShoppingList = async (req, res) => {
     // Uložíme seznam do databáze
     await newShoppingList.save();
 
-    // Odešleme vytvořený seznam zpět na frontend
+    // Odesílání seznamu zpět na frontend
     res.status(201).json(newShoppingList);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+
 
 exports.getShoppingList = async (req, res) => {
   try {
