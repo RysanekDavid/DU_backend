@@ -37,11 +37,12 @@ exports.getShoppingList = async (req, res) => {
   try {
     const shoppingList = await ShoppingList.findById(req.params.listId);
     if (!shoppingList) {
-      return res.status(404).json({ message: "Shopping list not found" });
+      return res.status(404).json({ message: "Nákupní seznam nenalezen" });
     }
     res.json(shoppingList);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Chyba při načítání seznamu:", error);
+    res.status(500).json({ message: "Interní chyba serveru" });
   }
 };
 
