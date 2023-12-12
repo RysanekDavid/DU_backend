@@ -1,5 +1,7 @@
 const ShoppingList = require("../models/shoppingListModel");
 
+const mongoose = require("mongoose");
+
 exports.getAllShoppingLists = async (req, res) => {
   try {
     const shoppingLists = await ShoppingList.find();
@@ -9,14 +11,12 @@ exports.getAllShoppingLists = async (req, res) => {
   }
 };
 
-const mongoose = require('mongoose');
-
 exports.createShoppingList = async (req, res) => {
   try {
     // Vytvoříme nový seznam s náhodným ownerId
     const newShoppingList = new ShoppingList({
       name: req.body.name,
-      ownerId: new mongoose.Types.ObjectId(), 
+      ownerId: new mongoose.Types.ObjectId(),
       members: [],
       items: [],
       archived: false,
@@ -32,7 +32,6 @@ exports.createShoppingList = async (req, res) => {
   }
 };
 
-
 exports.getShoppingList = async (req, res) => {
   try {
     const shoppingList = await ShoppingList.findById(req.params.listId);
@@ -46,17 +45,34 @@ exports.getShoppingList = async (req, res) => {
   }
 };
 
+const ShoppingList = require("../models/shoppingListModel");
+
 exports.addItemToList = async (req, res) => {
+  console.log("Params:", req.params);
+  const listId = req.params.listId;
   try {
-    const shoppingList = await ShoppingList.findById(req.params.listId);
+    // Najdeme seznam podle ID
+    const shoppingList = await ShoppingList.findById(listId);
+
     if (!shoppingList) {
       return res.status(404).json({ message: "Shopping list not found" });
     }
-    // Předpokládáme, že req.body obsahuje 'name' a 'quantity' položky
-    shoppingList.items.push(req.body);
+
+    const newItem = {
+      name: req.body.name,
+      quantity: req.body.quantity,
+      inBasket: false,
+    };
+
+    shoppingList.items.push(newItem);
+
+    // Uložení změn do databáze
     await shoppingList.save();
-    res.status(200).json(shoppingList);
+
+    // Odeslání odpovědi
+    res.status(201).json(newItem);
   } catch (error) {
+    console.error("Chyba při přidání položky do seznamu:", error);
     res.status(500).json({ message: error.message });
   }
 };
