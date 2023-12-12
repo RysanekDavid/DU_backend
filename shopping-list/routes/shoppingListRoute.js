@@ -1,6 +1,5 @@
 const express = require("express");
 const router = express.Router();
-
 const shoppingListController = require("../controllers/shoppingListController");
 
 // Získání všech nákupních seznamů

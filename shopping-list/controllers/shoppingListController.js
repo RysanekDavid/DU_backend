@@ -1,5 +1,4 @@
 const ShoppingList = require("../models/shoppingListModel");
-
 const mongoose = require("mongoose");
 
 exports.getAllShoppingLists = async (req, res) => {
@@ -44,8 +43,6 @@ exports.getShoppingList = async (req, res) => {
     res.status(500).json({ message: "Interní chyba serveru" });
   }
 };
-
-const ShoppingList = require("../models/shoppingListModel");
 
 exports.addItemToList = async (req, res) => {
   console.log("Params:", req.params);
