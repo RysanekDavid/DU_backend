@@ -12,19 +12,19 @@ exports.getAllShoppingLists = async (req, res) => {
 
 exports.createShoppingList = async (req, res) => {
   try {
-    // Vytvoříme nový seznam s náhodným ownerId
+    if (!req.body.name || req.body.name.trim() === "") {
+      return res.status(400).json({ message: "Name is required" });
+    }
+
     const newShoppingList = new ShoppingList({
-      name: req.body.name,
+      name: req.body.name.trim(),
       ownerId: new mongoose.Types.ObjectId(),
       members: [],
       items: [],
       archived: false,
     });
 
-    // Uložíme seznam do databáze
     await newShoppingList.save();
-
-    // Odesílání seznamu zpět na frontend
     res.status(201).json(newShoppingList);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -131,5 +131,44 @@ exports.updateShoppingListName = async (req, res) => {
     res.status(200).json(shoppingList);
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+};
+
+exports.updateShoppingList = async (req, res) => {
+  try {
+    const { listId } = req.params;
+    const updateData = req.body;
+
+    const shoppingList = await ShoppingList.findById(listId);
+    if (!shoppingList) {
+      return res.status(404).json({ message: "Nákupní seznam nenalezen" });
+    }
+
+    res.status(200).json(shoppingList);
+  } catch (error) {
+    res.status(500).json({ message: "Interní chyba serveru" });
+  }
+};
+
+exports.deleteShoppingList = async (req, res) => {
+  try {
+    const { listId } = req.params;
+    const convertedId = new mongoose.Types.ObjectId(listId);
+
+    const shoppingList = await ShoppingList.findById(convertedId);
+
+    if (!shoppingList) {
+      return res.status(404).json({ message: "Nákupní seznam nenalezen" });
+    }
+
+    await ShoppingList.deleteOne({ _id: convertedId });
+    res.status(200).json({ message: "Nákupní seznam byl úspěšně smazán" });
+  } catch (error) {
+    // Přidáno zachycení chyb pro případ, že ID není platné ObjectId
+    if (error.name === "CastError" && error.kind === "ObjectId") {
+      return res.status(400).json({ message: "Neplatné ID formátu" });
+    }
+    console.error("Chyba při mazání nákupního seznamu:", error);
+    res.status(500).json({ message: "Interní chyba serveru" });
   }
 };
